@@ -1,0 +1,13 @@
+information: 
+  name: "DerivativeClient"
+  repo: "AarushX/DerivativeMC"
+downloads:
+  useChunks: False
+  chunkSize: 8192
+urls:
+  setupsUrl: 'https://github.com/{}/releases/download/{}/{}_Setup.exe' # Repo, Version, App
+  tagsUrl: "https://api.github.com/repos/{}/tags" # Repo
+
+  
+
+  
