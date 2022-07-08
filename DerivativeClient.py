@@ -2,6 +2,8 @@ import PySimpleGUI as sg
 import subprocess, requests, shutil, os
 import filecmp, yaml, sys, json
 
+# I added this in github. behold the power of sync!!!!
+
 with open('config.yml', 'r') as file:
   config = yaml.safe_load(file)
 
@@ -69,19 +71,15 @@ if not filecmp.cmp(__file__,compared):
   restart()
 
 instancePath = os.path.expandvars(r'%APPDATA%\gdlauncher_next\instances')
-
 instances = [name for name in os.listdir(instancePath) if os.path.isdir(os.path.join(instancePath, name))]
 
-print (instances)
-
-
-# # Interactive Part of Application
+# Interactive Part of Application
 filteredList = ["Choose App First"]
 sg.theme('DarkAmber')
 layout = [[sg.Text('Welcome to the new installer!')],
   [sg.Text('Choose Type',size=(20, 1), font='Lucida',justification='left')],
   [sg.Combo(["HPFC","HPFS"],key='type',size=(30,2),default_value="Choose", enable_events=True)],
-  [sg.Text('Choose Version',size=(20, 1), font='Lucida',justification='left')],
+  [sg.Text('Choose Version',size=(20, 1), font='Lucida',justification='right')],
   [sg.Combo(filteredList,default_value="latest",key='version', enable_events=True)],
   [sg.Button('Install', font=('Times New Roman',12), key="Install"),
   sg.Button('Cancel', font=('Times New Roman',12), key="Cancel")]
@@ -101,7 +99,6 @@ while True:
     match identifier:
       case "latest":
         identifier = version
-    print("hi")
     runInstall(identifier, type)
 
 window.close()
