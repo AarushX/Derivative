@@ -29,8 +29,9 @@ def validateTag(tagToValidate,tags):
       return True
   return False
 
-def download(url, path):
+def download(url, path, overridenName=None):
   filename = url.split('/')[-1]
+  if (overridenName!=None): filename=overridenName
   path = path+"\\"+filename
   with requests.get(url, stream=True) as r:
     r.raise_for_status()
@@ -41,7 +42,9 @@ def download(url, path):
       else:
         shutil.copyfileobj(r.raw, f)
   return path
-
+def downloadSimple(url,path):
+  r = requests.get(url)
+  open(path, 'wb').write(r.content)
 def runInstall (version, app):
   tempDir = os.path.expandvars(r'%TEMP%'.format(name))
   path = download(setupsUrl.format(repo, version, app), tempDir)
@@ -49,7 +52,6 @@ def runInstall (version, app):
   returncode = subprocess.call(cmd, shell=True)
   if os.path.exists(path):
     os.remove(path)
-    print("removed ig")
   return True
 
 version = tagsList[0]
@@ -60,13 +62,11 @@ args.insert(0, sys.executable)
 def restart():
   os.chdir(os.getcwd())
   os.execv(sys.executable, args)
-#download(,".")
-compared = "DerivativeClient - Copy.py"
+downloadSimple("https://raw.githubusercontent.com/AarushX/DerivativeMC/main/DerivativeClient.py","DerivativeClientUpdated.py")
+compared = "DerivativeClientUpdated.py"
 if not filecmp.cmp(__file__,compared):
   shutil.move(compared,__file__)
   restart()
-
-
 
 instancePath = os.path.expandvars(r'%APPDATA%\gdlauncher_next\instances')
 
