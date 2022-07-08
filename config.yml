@@ -3,11 +3,8 @@ information:
   repo: "AarushX/DerivativeMC"
 downloads:
   useChunks: False
-  chunkSize: 8192
+  chunkSize: 8192 
 urls:
   setupsUrl: 'https://github.com/{}/releases/download/{}/{}_Setup.exe' # Repo, Version, App
   tagsUrl: "https://api.github.com/repos/{}/tags" # Repo
-
-  
-
-  
+token: # Your Github Access Token Here
