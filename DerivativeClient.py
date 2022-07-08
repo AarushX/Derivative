@@ -87,7 +87,7 @@ if not filecmp.cmp(__file__,compared):
 # instances = [name for name in os.listdir(instancePath) if os.path.isdir(os.path.join(instancePath, name))]
 
 # Application GUI Config
-sg.theme('DarkAmber')
+sg.theme('DarkTeal12')
 layout = [[sg.Text('Welcome to the new installer!')],
   [sg.Text('Choose Type',size=(20, 1), font='Lucida',justification='left')],
   [sg.Combo(["HPFC","HPFS"],key='type',size=(30,2),default_value="Choose", enable_events=True)],
