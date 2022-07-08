@@ -1,12 +1,10 @@
 import PySimpleGUI as sg
-import subprocess, requests, shutil, os
-import filecmp, yaml, sys, json
+import subprocess, requests, shutil, os, filecmp, yaml, sys, json
 
 # I added this in github. behold the power of sync!!!!
-
+# Configuration and Definitions
 with open('config.yml', 'r') as file:
   config = yaml.safe_load(file)
-
 name = config["information"]["name"]
 repo = config["information"]["repo"]
 useChunks = config["downloads"]["useChunks"]
@@ -14,23 +12,35 @@ chunkSize = config["downloads"]["chunkSize"]
 setupsUrl = config["urls"]["setupsUrl"]
 tagsUrl = config["urls"]["tagsUrl"].format(repo)
 token = config["token"]
-print(token)
+filteredList = ["Choose App First"]
+compared = "DerivativeClientUpdated.py"
+
+## Define Functions ##
+# Gets the tags from a url
 def getTags(tagsUrl, token=token):
   tagsList = []
   tagsDeserialized = json.loads(
-    requests.get(tagsUrl, headers={"Authorization":f"token {token}"}).text
+    requests.get(
+      tagsUrl, 
+      headers={
+        "Authorization":f"token {token}"
+        }
+      ).text
   )
-  print(tagsDeserialized)
   for tag in tagsDeserialized: 
     tagsList.append(tag["name"])
   return tagsList, tagsDeserialized
 tagsList, tagsDeserialized = getTags(tagsUrl)
+
+# Deprecated!
+# Validate Tag to check for tags in a repo
 def validateTag(tagToValidate,tags):
   for tag in tags:
     if tag["name"] == tagToValidate:
       return True
   return False
 
+# Downloads large files such as installers
 def download(url, path, overridenName=None):
   filename = url.split('/')[-1]
   if (overridenName!=None): filename=overridenName
@@ -55,26 +65,28 @@ def runInstall (version, app):
   if os.path.exists(path):
     os.remove(path)
   return True
-
-version = tagsList[0]
-print(tagsList)
-
-args = sys.argv[:]
-args.insert(0, sys.executable)
 def restart():
   os.chdir(os.getcwd())
   os.execv(sys.executable, args)
-downloadSimple("https://raw.githubusercontent.com/AarushX/DerivativeMC/main/DerivativeClient.py","DerivativeClientUpdated.py")
-compared = "DerivativeClientUpdated.py"
+
+version = tagsList[0]
+
+# Auto-Updater Script
+args = sys.argv[:]
+args.insert(0, sys.executable)
+downloadSimple(
+  "https://raw.githubusercontent.com/AarushX/DerivativeMC/main/DerivativeClient.py",
+  compared
+)
 if not filecmp.cmp(__file__,compared):
   shutil.move(compared,__file__)
   restart()
 
-instancePath = os.path.expandvars(r'%APPDATA%\gdlauncher_next\instances')
-instances = [name for name in os.listdir(instancePath) if os.path.isdir(os.path.join(instancePath, name))]
+# # Currently Unused Instance Reading (check out for future updates--- that'll autoinstall lol)
+# instancePath = os.path.expandvars(r'%APPDATA%\gdlauncher_next\instances')
+# instances = [name for name in os.listdir(instancePath) if os.path.isdir(os.path.join(instancePath, name))]
 
-# Interactive Part of Application
-filteredList = ["Choose App First"]
+# Application GUI Config
 sg.theme('DarkAmber')
 layout = [[sg.Text('Welcome to the new installer!')],
   [sg.Text('Choose Type',size=(20, 1), font='Lucida',justification='left')],
@@ -85,12 +97,18 @@ layout = [[sg.Text('Welcome to the new installer!')],
   sg.Button('Cancel', font=('Times New Roman',12), key="Cancel")]
 ]
 window = sg.Window('High Performance Installer', layout, finalize=True)
+
+# GUI Event Loop
 while True:
   event, values = window.read()
   if event == sg.WIN_CLOSED or event == 'Cancel':
     break
   if event == 'type':
-    filteredList = getTags("https://api.github.com/repos/AarushX/{}/tags".format(values["type"]))[0]
+    filteredList = getTags(
+      "https://api.github.com/repos/AarushX/{}/tags"
+      .format(
+        values["type"])
+      )[0]
     window['version'].update(value="latest", values=filteredList)
     window.refresh()
   if event == 'Install':
@@ -100,11 +118,4 @@ while True:
       case "latest":
         identifier = version
     runInstall(identifier, type)
-
 window.close()
-
-tags = requests.get(tagsUrl)
-tagsList = []
-tagsDeserialized = json.loads(tags.text)
-for tag in tagsDeserialized: 
-  tagsList.append(tag["name"])
